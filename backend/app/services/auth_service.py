@@ -50,7 +50,11 @@ def _generate_refresh_token() -> tuple[str, str]:
     return raw_token, token_hash
 
 
-def authenticate_and_issue_tokens(db: Session, email: str, password: str) -> dict:
+def authenticate_and_issue_tokens(
+    db: Session, email: str, password: str, ip_address: str, redis_client
+) -> dict:
+    from app.services import siem_service  # local import avoids a circular import with siem_service
+
     user = db.query(User).filter(User.email == email).first()
 
     # Deliberately vague error message: "Incorrect email or password" for
@@ -59,10 +63,15 @@ def authenticate_and_issue_tokens(db: Session, email: str, password: str) -> dic
     # an attacker enumerate which emails are registered - a real OWASP
     # concern (user enumeration).
     if not user or not verify_password(password, user.hashed_password):
+        siem_service.record_login_attempt(
+            db, redis_client, email, ip_address, success=False, user_id=user.id if user else None
+        )
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Incorrect email or password.")
 
     if not user.is_active:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "This account has been disabled.")
+
+    siem_service.record_login_attempt(db, redis_client, email, ip_address, success=True, user_id=user.id)
 
     access_token = create_access_token(subject=str(user.id), role=user.role.value)
 

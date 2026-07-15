@@ -11,10 +11,11 @@ lives in app/services/auth_service.py. This is the "thin routes, fat
 services" pattern mentioned in the architecture doc.
 """
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
+from app.core.redis_client import get_redis
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.auth import RefreshRequest, TokenResponse, UserCreate, UserLogin, UserResponse
@@ -30,8 +31,15 @@ def register(payload: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(payload: UserLogin, db: Session = Depends(get_db)):
-    tokens = auth_service.authenticate_and_issue_tokens(db, payload.email, payload.password)
+def login(payload: UserLogin, request: Request, db: Session = Depends(get_db), redis_client=Depends(get_redis)):
+    # request.client.host gives the direct connecting IP. Behind a reverse
+    # proxy (e.g. the Nginx setup in a later DevOps module), this would
+    # need to read X-Forwarded-For instead - noted here as a real
+    # production gap, not silently ignored.
+    ip_address = request.client.host if request.client else "unknown"
+    tokens = auth_service.authenticate_and_issue_tokens(
+        db, payload.email, payload.password, ip_address, redis_client
+    )
     return tokens
 
 

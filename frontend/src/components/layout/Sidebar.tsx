@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { label: "Website Scanner", path: "/scanner", enabled: true },
   { label: "Phishing Detection", path: "/phishing", enabled: false },
   { label: "Network Monitoring", path: "/network", enabled: false },
-  { label: "Mini SIEM", path: "/siem", enabled: false },
+  { label: "Mini SIEM", path: "/siem", enabled: true },
   { label: "Threat Intelligence", path: "/threat-intel", enabled: false },
   { label: "Digital Forensics", path: "/forensics", enabled: false },
   { label: "AI Assistant", path: "/assistant", enabled: false },

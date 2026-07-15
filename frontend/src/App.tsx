@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Scanner from "./pages/Scanner";
+import Siem from "./pages/Siem";
 
 function App() {
   return (
@@ -26,6 +27,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Scanner />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/siem"
+            element={
+              <ProtectedRoute>
+                <Siem />
               </ProtectedRoute>
             }
           />
