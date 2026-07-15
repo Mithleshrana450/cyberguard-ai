@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 // true as each module is built.
 const NAV_ITEMS = [
   { label: "Dashboard", path: "/dashboard", enabled: true },
-  { label: "Website Scanner", path: "/scanner", enabled: false },
+  { label: "Website Scanner", path: "/scanner", enabled: true },
   { label: "Phishing Detection", path: "/phishing", enabled: false },
   { label: "Network Monitoring", path: "/network", enabled: false },
   { label: "Mini SIEM", path: "/siem", enabled: false },
