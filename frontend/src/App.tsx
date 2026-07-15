@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Scanner from "./pages/Scanner";
 import Siem from "./pages/Siem";
+import ThreatIntel from "./pages/ThreatIntel";
 
 function App() {
   return (
@@ -35,6 +36,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Siem />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/threat-intel"
+            element={
+              <ProtectedRoute>
+                <ThreatIntel />
               </ProtectedRoute>
             }
           />

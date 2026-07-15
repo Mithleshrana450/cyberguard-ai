@@ -47,13 +47,19 @@ def override_get_db():
 class FakeRedis:
     """
     Minimal in-memory stand-in for redis-py's client, implementing just the
-    three operations siem_service.py actually uses (incr, expire, delete).
-    Good enough for tests without needing a real Redis server, and without
+    operations this project actually uses: incr/expire/delete (Module 4's
+    brute-force counter) and get/setex (Module 5's lookup cache). Good
+    enough for tests without needing a real Redis server, and without
     adding a heavier third-party fake-redis dependency to the project.
+
+    Real redis-py, with decode_responses=True, stores everything as
+    strings internally (even integers get returned as string digits) - we
+    mirror that here with a single dict so callers can't accidentally rely
+    on Python type distinctions real Redis wouldn't give them either.
     """
 
     def __init__(self):
-        self._store: dict[str, int] = {}
+        self._store: dict[str, str] = {}
         self._expiry: dict[str, float] = {}
 
     def _check_expired(self, key: str):
@@ -63,8 +69,9 @@ class FakeRedis:
 
     def incr(self, key: str) -> int:
         self._check_expired(key)
-        self._store[key] = self._store.get(key, 0) + 1
-        return self._store[key]
+        current = int(self._store.get(key, 0))
+        self._store[key] = str(current + 1)
+        return current + 1
 
     def expire(self, key: str, seconds: int) -> None:
         self._expiry[key] = time.time() + seconds
@@ -72,6 +79,14 @@ class FakeRedis:
     def delete(self, key: str) -> None:
         self._store.pop(key, None)
         self._expiry.pop(key, None)
+
+    def get(self, key: str):
+        self._check_expired(key)
+        return self._store.get(key)
+
+    def setex(self, key: str, seconds: int, value: str) -> None:
+        self._store[key] = value
+        self._expiry[key] = time.time() + seconds
 
 
 fake_redis = FakeRedis()

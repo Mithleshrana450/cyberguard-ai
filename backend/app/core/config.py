@@ -34,6 +34,12 @@ class Settings(BaseSettings):
     # --- CORS ---
     CORS_ORIGINS: list[str] = ["http://localhost:5173"]
 
+    # --- Threat Intelligence (Module 5) ---
+    # Free tier key from https://www.virustotal.com/gui/join-us - never
+    # commit a real value here. Empty string means the feature will return
+    # a clear "not configured" error instead of crashing.
+    VIRUSTOTAL_API_KEY: str = ""
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
