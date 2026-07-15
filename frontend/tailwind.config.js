@@ -5,12 +5,31 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Placeholder palette - we'll design the real token system
-        // deliberately in Module 2 (Dashboard) using the frontend-design
-        // process rather than picking defaults now.
-        background: "#0B0F14",
-        surface: "#121821",
-        accent: "#3FB68B",
+        background: "#0A0E14",
+        surface: "#131820",
+        "surface-elevated": "#1B2230",
+        border: "#232B3A",
+        "text-primary": "#E7EAF0",
+        "text-secondary": "#8892A6",
+        accent: "#4FD1C5",
+        "accent-dim": "#2C5F5A",
+        safe: "#4ADE80",
+        warning: "#FBBF24",
+        critical: "#F87171",
+      },
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
+        mono: ["'JetBrains Mono'", "'Fira Code'", "monospace"],
+      },
+      keyframes: {
+        "scan-sweep": {
+          "0%": { transform: "translateX(-100%)", opacity: "0" },
+          "10%": { opacity: "1" },
+          "100%": { transform: "translateX(100%)", opacity: "0" },
+        },
+      },
+      animation: {
+        "scan-sweep": "scan-sweep 2s ease-out 1",
       },
     },
   },
