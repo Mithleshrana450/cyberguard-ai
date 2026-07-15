@@ -26,7 +26,14 @@ export default function Register() {
   };
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center px-4">
+    <main
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{
+        background:
+          "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(79, 209, 197, 0.06), transparent), " +
+          "linear-gradient(180deg, #0A0E14 0%, #090C11 100%)",
+      }}
+    >
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-semibold text-text-primary">CyberGuard AI</h1>
@@ -35,7 +42,7 @@ export default function Register() {
 
         <form
           onSubmit={handleSubmit}
-          className="bg-surface border border-border rounded-lg p-6 flex flex-col gap-4"
+          className="card p-6 flex flex-col gap-4"
         >
           {error && (
             <div className="text-critical text-sm bg-critical/10 border border-critical/30 rounded px-3 py-2">

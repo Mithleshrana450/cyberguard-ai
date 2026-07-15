@@ -1,6 +1,9 @@
 import { FormEvent, useEffect, useState } from "react";
+import { ScanLine } from "lucide-react";
 import AppLayout from "../components/layout/AppLayout";
 import FindingCard from "../components/scanner/FindingCard";
+import Skeleton from "../components/ui/Skeleton";
+import EmptyState from "../components/ui/EmptyState";
 import api from "../services/api";
 
 type Finding = {
@@ -44,7 +47,7 @@ export default function Scanner() {
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ScanResult | null>(null);
-  const [history, setHistory] = useState<ScanListItem[]>([]);
+  const [history, setHistory] = useState<ScanListItem[] | null>(null);
 
   const loadHistory = () => {
     api.get<ScanListItem[]>("/scanner/scans").then((res) => setHistory(res.data));
@@ -76,7 +79,7 @@ export default function Scanner() {
 
   return (
     <AppLayout title="Website Security Scanner">
-      <div className="mb-6">
+      <div className="mb-8">
         <p className="text-text-primary text-lg">Scan a website</p>
         <p className="text-text-secondary text-sm">
           Checks security headers, TLS certificate health, and robots.txt exposure.{" "}
@@ -84,33 +87,41 @@ export default function Scanner() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-3 mb-6">
+      <form onSubmit={handleSubmit} className="flex gap-3 mb-8">
         <input
           type="url"
           required
           value={targetUrl}
           onChange={(e) => setTargetUrl(e.target.value)}
           placeholder="https://example.com"
-          className="flex-1 bg-surface border border-border rounded px-3 py-2 text-text-primary text-sm font-mono focus:outline-none focus:border-accent"
+          className="flex-1 bg-surface border border-border rounded-lg px-3 py-2 text-text-primary text-sm font-mono focus:outline-none focus:border-accent"
         />
         <button
           type="submit"
           disabled={isScanning}
-          className="bg-accent text-background font-medium rounded px-5 py-2 text-sm hover:bg-accent/90 disabled:opacity-50 transition-colors whitespace-nowrap"
+          className="bg-accent text-background font-medium rounded-lg px-5 py-2 text-sm hover:bg-accent/90 disabled:opacity-50 transition-colors whitespace-nowrap"
         >
           {isScanning ? "Scanning..." : "Run Scan"}
         </button>
       </form>
 
       {error && (
-        <div className="text-critical text-sm bg-critical/10 border border-critical/30 rounded px-3 py-2 mb-6">
+        <div className="text-critical text-sm bg-critical/10 border border-critical/30 rounded-lg px-3 py-2 mb-8">
           {error}
         </div>
       )}
 
+      {isScanning && (
+        <div className="mb-8 flex flex-col gap-3">
+          <Skeleton className="h-20" />
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+        </div>
+      )}
+
       {result && (
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4 bg-surface border border-border rounded-lg p-4">
+        <div className="mb-10">
+          <div className="flex items-center gap-4 mb-4 card p-4">
             <div>
               <p className="text-text-secondary text-xs uppercase tracking-wide">Security Score</p>
               <p className={`font-mono text-3xl font-semibold ${scoreColor(result.security_score)}`}>
@@ -139,11 +150,23 @@ export default function Scanner() {
         </div>
       )}
 
-      <div className="bg-surface border border-border rounded-lg p-5">
+      <div className="card p-5">
         <p className="text-text-secondary text-xs uppercase tracking-wide mb-4">Scan History</p>
-        {history.length === 0 ? (
-          <p className="text-text-secondary text-sm">No scans yet - run your first scan above.</p>
-        ) : (
+        {history === null && (
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-10" />
+            <Skeleton className="h-10" />
+            <Skeleton className="h-10" />
+          </div>
+        )}
+        {history && history.length === 0 && (
+          <EmptyState
+            icon={ScanLine}
+            title="No scans yet"
+            description="Run your first scan above to start building a security history for your sites."
+          />
+        )}
+        {history && history.length > 0 && (
           <ul className="flex flex-col divide-y divide-border">
             {history.map((scan) => (
               <li key={scan.id} className="py-3 flex items-center justify-between gap-3 text-sm">

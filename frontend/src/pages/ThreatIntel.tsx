@@ -1,5 +1,8 @@
 import { FormEvent, useEffect, useState } from "react";
+import { Radar } from "lucide-react";
 import AppLayout from "../components/layout/AppLayout";
+import Skeleton from "../components/ui/Skeleton";
+import EmptyState from "../components/ui/EmptyState";
 import api from "../services/api";
 
 type LookupType = "ip" | "domain" | "url" | "hash";
@@ -36,7 +39,7 @@ export default function ThreatIntel() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<LookupResult | null>(null);
-  const [history, setHistory] = useState<LookupResult[]>([]);
+  const [history, setHistory] = useState<LookupResult[] | null>(null);
 
   const loadHistory = () => {
     api.get<LookupResult[]>("/threat-intel/history").then((res) => setHistory(res.data));
@@ -69,18 +72,18 @@ export default function ThreatIntel() {
 
   return (
     <AppLayout title="Threat Intelligence">
-      <div className="mb-6">
+      <div className="mb-8">
         <p className="text-text-primary text-lg">Look up an indicator</p>
         <p className="text-text-secondary text-sm">
           Checks IPs, domains, URLs, and file hashes against VirusTotal's aggregated vendor data.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-3 mb-6">
+      <form onSubmit={handleSubmit} className="flex gap-3 mb-8">
         <select
           value={lookupType}
           onChange={(e) => setLookupType(e.target.value as LookupType)}
-          className="bg-surface border border-border rounded px-3 py-2 text-text-primary text-sm focus:outline-none focus:border-accent"
+          className="bg-surface border border-border rounded-lg px-3 py-2 text-text-primary text-sm focus:outline-none focus:border-accent"
         >
           {TYPE_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -94,29 +97,31 @@ export default function ThreatIntel() {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder={currentOption.placeholder}
-          className="flex-1 bg-surface border border-border rounded px-3 py-2 text-text-primary text-sm font-mono focus:outline-none focus:border-accent"
+          className="flex-1 bg-surface border border-border rounded-lg px-3 py-2 text-text-primary text-sm font-mono focus:outline-none focus:border-accent"
         />
         <button
           type="submit"
           disabled={isLoading}
-          className="bg-accent text-background font-medium rounded px-5 py-2 text-sm hover:bg-accent/90 disabled:opacity-50 transition-colors whitespace-nowrap"
+          className="bg-accent text-background font-medium rounded-lg px-5 py-2 text-sm hover:bg-accent/90 disabled:opacity-50 transition-colors whitespace-nowrap"
         >
           {isLoading ? "Checking..." : "Look Up"}
         </button>
       </form>
 
       {error && (
-        <div className="text-critical text-sm bg-critical/10 border border-critical/30 rounded px-3 py-2 mb-6">
+        <div className="text-critical text-sm bg-critical/10 border border-critical/30 rounded-lg px-3 py-2 mb-8">
           {error}
         </div>
       )}
 
+      {isLoading && <Skeleton className="h-24 mb-8" />}
+
       {result && (
-        <div className="bg-surface border border-border rounded-lg p-5 mb-8">
+        <div className="card p-5 mb-10">
           <div className="flex items-center justify-between gap-3 mb-3">
             <p className="font-mono text-text-primary text-sm">{result.query_value}</p>
             <span
-              className={`text-xs uppercase tracking-wide border rounded px-2 py-1 ${VERDICT_STYLES[result.verdict]}`}
+              className={`text-xs uppercase tracking-wide border rounded-lg px-2 py-1 ${VERDICT_STYLES[result.verdict]}`}
             >
               {result.verdict}
             </span>
@@ -125,11 +130,25 @@ export default function ThreatIntel() {
         </div>
       )}
 
-      <div className="bg-surface border border-border rounded-lg p-5">
+      <div className="card p-5">
         <p className="text-text-secondary text-xs uppercase tracking-wide mb-4">Lookup History</p>
-        {history.length === 0 ? (
-          <p className="text-text-secondary text-sm">No lookups yet - run your first check above.</p>
-        ) : (
+
+        {history === null && (
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-10" />
+            <Skeleton className="h-10" />
+          </div>
+        )}
+
+        {history && history.length === 0 && (
+          <EmptyState
+            icon={Radar}
+            title="No lookups yet"
+            description="Run your first check above to start building a threat intelligence history."
+          />
+        )}
+
+        {history && history.length > 0 && (
           <ul className="flex flex-col divide-y divide-border">
             {history.map((item) => (
               <li key={item.id} className="py-3 flex items-center justify-between gap-3 text-sm">
@@ -138,7 +157,7 @@ export default function ThreatIntel() {
                   <span className="font-mono text-text-primary truncate">{item.query_value}</span>
                 </div>
                 <span
-                  className={`text-xs uppercase tracking-wide border rounded px-2 py-0.5 shrink-0 ${VERDICT_STYLES[item.verdict]}`}
+                  className={`text-xs uppercase tracking-wide border rounded-lg px-2 py-0.5 shrink-0 ${VERDICT_STYLES[item.verdict]}`}
                 >
                   {item.verdict}
                 </span>

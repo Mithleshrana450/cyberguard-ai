@@ -5,3 +5,12 @@
 body {
   font-family: "Inter", system-ui, sans-serif;
 }
+
+@layer components {
+  .card {
+    @apply bg-surface border border-border rounded-lg shadow-soft-sm transition-shadow duration-200;
+  }
+  .card:hover {
+    @apply shadow-soft;
+  }
+}

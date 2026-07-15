@@ -11,7 +11,7 @@ type Finding = {
 
 export default function FindingCard({ finding }: { finding: Finding }) {
   return (
-    <div className="bg-surface-elevated border border-border rounded-lg p-4 flex flex-col gap-2">
+    <div className="bg-surface-elevated border border-border rounded-lg shadow-soft-sm p-4 flex flex-col gap-2">
       <div className="flex items-center justify-between gap-3">
         <p className="text-text-primary text-sm font-medium">{finding.title}</p>
         <SeverityBadge severity={finding.severity} />

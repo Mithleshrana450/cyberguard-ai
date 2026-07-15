@@ -17,7 +17,7 @@ export default function StatCard({
   tone?: Tone;
 }) {
   return (
-    <div className="bg-surface border border-border rounded-lg p-4 flex flex-col gap-1">
+    <div className="card p-4 flex flex-col gap-1.5">
       <p className="text-text-secondary text-xs uppercase tracking-wide">{label}</p>
       <p className={`font-mono text-2xl font-semibold ${TONE_STYLES[tone]}`}>{value}</p>
     </div>

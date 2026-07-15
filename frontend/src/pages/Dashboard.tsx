@@ -3,6 +3,7 @@ import AppLayout from "../components/layout/AppLayout";
 import SecurityScoreCard from "../components/dashboard/SecurityScoreCard";
 import StatCard from "../components/dashboard/StatCard";
 import RecentActivity from "../components/dashboard/RecentActivity";
+import Skeleton from "../components/ui/Skeleton";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
@@ -18,17 +19,19 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     api
       .get<DashboardSummary>("/dashboard/summary")
       .then((res) => setSummary(res.data))
-      .catch(() => setError("Could not load dashboard data."));
+      .catch(() => setError("Could not load dashboard data."))
+      .finally(() => setIsLoading(false));
   }, []);
 
   return (
     <AppLayout title="Dashboard">
-      <div className="mb-6">
+      <div className="mb-8">
         <p className="text-text-primary text-lg">Welcome back, {user?.full_name.split(" ")[0]}</p>
         <p className="text-text-secondary text-sm">
           Here's the current state of your security posture.
@@ -37,10 +40,21 @@ export default function Dashboard() {
 
       {error && <p className="text-critical text-sm mb-4">{error}</p>}
 
+      {isLoading && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <Skeleton className="h-40" />
+          <div className="lg:col-span-2 grid grid-cols-3 gap-6">
+            <Skeleton className="h-20" />
+            <Skeleton className="h-20" />
+            <Skeleton className="h-20" />
+          </div>
+        </div>
+      )}
+
       {summary && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <SecurityScoreCard score={summary.security_score} />
-          <div className="lg:col-span-2 grid grid-cols-3 gap-4">
+          <div className="lg:col-span-2 grid grid-cols-3 gap-6">
             <StatCard label="Active Alerts" value={summary.active_alerts} tone="warning" />
             <StatCard label="Critical Alerts" value={summary.critical_alerts} tone="critical" />
             <StatCard label="Scans Run" value={summary.total_scans_run} tone="neutral" />

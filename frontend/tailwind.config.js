@@ -21,6 +21,19 @@ export default {
         sans: ["Inter", "system-ui", "sans-serif"],
         mono: ["'JetBrains Mono'", "'Fira Code'", "monospace"],
       },
+      borderRadius: {
+        // Overrides Tailwind's default 'lg' (8px) globally - every
+        // existing `rounded-lg` class across the app becomes a
+        // consistent 12px without editing each component individually.
+        lg: "12px",
+        xl: "14px",
+      },
+      boxShadow: {
+        // Soft, diffuse shadows rather than Tailwind's sharper defaults -
+        // reads as "elevated surface" rather than "cut-out sticker."
+        soft: "0 8px 30px -12px rgba(0, 0, 0, 0.55)",
+        "soft-sm": "0 4px 16px -6px rgba(0, 0, 0, 0.4)",
+      },
       keyframes: {
         "scan-sweep": {
           "0%": { transform: "translateX(-100%)", opacity: "0" },

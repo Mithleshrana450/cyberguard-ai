@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import { ShieldCheck, ListTree } from "lucide-react";
 import AppLayout from "../components/layout/AppLayout";
 import SeverityBadge from "../components/scanner/SeverityBadge";
+import Skeleton from "../components/ui/Skeleton";
+import EmptyState from "../components/ui/EmptyState";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
@@ -29,10 +32,6 @@ export default function Siem() {
   const [events, setEvents] = useState<LoginEvent[] | null>(null);
   const [forbidden, setForbidden] = useState(false);
 
-  // Client-side role check gives an immediate, friendly message instead of
-  // firing a request we already know the server will reject with 403 -
-  // but the SERVER-SIDE check (require_role in siem.py) is what actually
-  // enforces this; this is UX polish, not the security boundary itself.
   const hasAccess = user?.role === "admin" || user?.role === "analyst";
 
   useEffect(() => {
@@ -50,7 +49,7 @@ export default function Siem() {
   if (!hasAccess) {
     return (
       <AppLayout title="Mini SIEM">
-        <div className="bg-surface border border-border rounded-lg p-6 text-center max-w-md mx-auto mt-12">
+        <div className="card p-6 text-center max-w-md mx-auto mt-12">
           <p className="text-text-primary font-medium mb-1">Restricted to Analyst / Admin roles</p>
           <p className="text-text-secondary text-sm">
             Login events and security alerts are platform-wide data, so this view is limited to
@@ -63,7 +62,7 @@ export default function Siem() {
 
   return (
     <AppLayout title="Mini SIEM">
-      <div className="mb-6">
+      <div className="mb-8">
         <p className="text-text-primary text-lg">Security Alerts &amp; Login Activity</p>
         <p className="text-text-secondary text-sm">
           Brute-force detection triggers automatically after 5 failed logins from the same IP
@@ -74,16 +73,29 @@ export default function Siem() {
       {forbidden && <p className="text-critical text-sm mb-4">Access denied by server.</p>}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-surface border border-border rounded-lg p-5">
+        <div className="card p-5">
           <p className="text-text-secondary text-xs uppercase tracking-wide mb-4">
             Security Alerts {alerts && `(${alerts.length})`}
           </p>
-          {alerts && alerts.length === 0 && (
-            <p className="text-safe text-sm">No alerts - nothing suspicious detected yet.</p>
+
+          {alerts === null && (
+            <div className="flex flex-col gap-3">
+              <Skeleton className="h-16" />
+              <Skeleton className="h-16" />
+            </div>
           )}
+
+          {alerts && alerts.length === 0 && (
+            <EmptyState
+              icon={ShieldCheck}
+              title="No alerts"
+              description="Nothing suspicious detected yet - brute-force attempts will show up here automatically."
+            />
+          )}
+
           <div className="flex flex-col gap-3">
             {alerts?.map((alert) => (
-              <div key={alert.id} className="bg-surface-elevated border border-border rounded p-3">
+              <div key={alert.id} className="bg-surface-elevated border border-border rounded-lg shadow-soft-sm p-3">
                 <div className="flex items-center justify-between gap-2 mb-1">
                   <p className="text-text-primary text-sm font-medium">{alert.title}</p>
                   <SeverityBadge severity={alert.severity} />
@@ -97,16 +109,30 @@ export default function Siem() {
           </div>
         </div>
 
-        <div className="bg-surface border border-border rounded-lg p-5">
+        <div className="card p-5">
           <p className="text-text-secondary text-xs uppercase tracking-wide mb-4">
             Recent Login Events {events && `(${events.length})`}
           </p>
-          {events && events.length === 0 && (
-            <p className="text-text-secondary text-sm">No login events recorded yet.</p>
+
+          {events === null && (
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-8" />
+              <Skeleton className="h-8" />
+              <Skeleton className="h-8" />
+            </div>
           )}
+
+          {events && events.length === 0 && (
+            <EmptyState
+              icon={ListTree}
+              title="No login events"
+              description="Login attempts, successful or failed, will be recorded here."
+            />
+          )}
+
           <ul className="flex flex-col divide-y divide-border">
             {events?.map((event) => (
-              <li key={event.id} className="py-2 flex items-center justify-between gap-3 text-sm">
+              <li key={event.id} className="py-2.5 flex items-center justify-between gap-3 text-sm">
                 <div className="min-w-0">
                   <p className="text-text-primary font-mono truncate">{event.email_attempted}</p>
                   <p className="text-text-secondary text-xs font-mono">{event.ip_address}</p>
