@@ -40,6 +40,11 @@ class Settings(BaseSettings):
     # a clear "not configured" error instead of crashing.
     VIRUSTOTAL_API_KEY: str = ""
 
+    # --- AI Security Assistant / Phishing Detection (Module 7) ---
+    # Paid API, small usage-based cost. Empty string means the app falls
+    # back to heuristics-only phishing analysis rather than crashing.
+    OPENAI_API_KEY: str = ""
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 

@@ -8,6 +8,7 @@ import Scanner from "./pages/Scanner";
 import Siem from "./pages/Siem";
 import ThreatIntel from "./pages/ThreatIntel";
 import Forensics from "./pages/Forensics";
+import Phishing from "./pages/Phishing";
 
 function App() {
   return (
@@ -53,6 +54,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Forensics />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/phishing"
+            element={
+              <ProtectedRoute>
+                <Phishing />
               </ProtectedRoute>
             }
           />
