@@ -28,7 +28,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Network Monitoring", path: "/network", icon: Network, enabled: false },
   { label: "Mini SIEM", path: "/siem", icon: ClipboardList, enabled: true },
   { label: "Threat Intelligence", path: "/threat-intel", icon: Radar, enabled: true },
-  { label: "Digital Forensics", path: "/forensics", icon: Fingerprint, enabled: false },
+  { label: "Digital Forensics", path: "/forensics", icon: Fingerprint, enabled: true },
   { label: "AI Assistant", path: "/assistant", icon: Brain, enabled: false },
   { label: "Incidents", path: "/incidents", icon: Siren, enabled: false },
   { label: "Reports", path: "/reports", icon: FileBarChart2, enabled: false },

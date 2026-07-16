@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Scanner from "./pages/Scanner";
 import Siem from "./pages/Siem";
 import ThreatIntel from "./pages/ThreatIntel";
+import Forensics from "./pages/Forensics";
 
 function App() {
   return (
@@ -44,6 +45,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ThreatIntel />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/forensics"
+            element={
+              <ProtectedRoute>
+                <Forensics />
               </ProtectedRoute>
             }
           />

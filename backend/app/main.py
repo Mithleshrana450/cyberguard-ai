@@ -15,7 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.api.v1 import health, auth, dashboard, scanner, siem, threat_intel
+from app.api.v1 import health, auth, dashboard, scanner, siem, threat_intel, forensics
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -45,6 +45,7 @@ app.include_router(dashboard.router, prefix="/api/v1")
 app.include_router(scanner.router, prefix="/api/v1")
 app.include_router(siem.router, prefix="/api/v1")
 app.include_router(threat_intel.router, prefix="/api/v1")
+app.include_router(forensics.router, prefix="/api/v1")
 
 
 @app.get("/", tags=["Root"])
