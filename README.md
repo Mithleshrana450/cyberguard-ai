@@ -56,7 +56,11 @@ See the [Roadmap](#-roadmap) for the full build order.
 ## 📸 Screenshots
 
 > _Add screenshots of your running app here — the Dashboard, Scanner results, and SIEM alert view make strong portfolio visuals. Drag images into this section on GitHub, or reference files in a `docs/screenshots/` folder, e.g.:_
-> `![Dashboard](docs/screenshots/dashboard.png)`
+> `![Dashboard](docs/screenshots/Screenshot\ From\ 2026-07-16\ 20-20-25.png)`
+> `![Scanner](docs/screenshots/Screenshot\ From\ 2026-07-16\ 20-20-19.png)`
+> `![SIEM](docs/screenshots/Screenshot\ From\ 2026-07-16\ 20-20-40.png)`
+> `![Threat Intelligence](docs/screenshots/Screenshot\ From\ 2026-07-16\ 20-20-30.png)`
+> `![Login](docs/screenshots/Screenshot\ From\ 2026-07-16\ 20-20-13.png)`
 
 ---
 
