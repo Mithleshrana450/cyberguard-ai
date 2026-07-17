@@ -25,7 +25,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, enabled: true },
   { label: "Website Scanner", path: "/scanner", icon: Globe, enabled: true },
   { label: "Phishing Detection", path: "/phishing", icon: Fish, enabled: true },
-  { label: "Network Monitoring", path: "/network", icon: Network, enabled: false },
+  { label: "Network Monitoring", path: "/network", icon: Network, enabled: true },
   { label: "Mini SIEM", path: "/siem", icon: ClipboardList, enabled: true },
   { label: "Threat Intelligence", path: "/threat-intel", icon: Radar, enabled: true },
   { label: "Digital Forensics", path: "/forensics", icon: Fingerprint, enabled: true },

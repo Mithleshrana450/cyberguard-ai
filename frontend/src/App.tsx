@@ -9,6 +9,7 @@ import Siem from "./pages/Siem";
 import ThreatIntel from "./pages/ThreatIntel";
 import Forensics from "./pages/Forensics";
 import Phishing from "./pages/Phishing";
+import NetworkMonitoring from "./pages/NetworkMonitoring";
 
 function App() {
   return (
@@ -62,6 +63,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Phishing />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/network"
+            element={
+              <ProtectedRoute>
+                <NetworkMonitoring />
               </ProtectedRoute>
             }
           />

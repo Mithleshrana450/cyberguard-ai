@@ -5,3 +5,4 @@ from app.models.security_event import LoginEvent, SecurityAlert, AlertSeverity, 
 from app.models.threat_intel import ThreatLookup, LookupType, Verdict  # noqa: F401
 from app.models.forensics import ForensicsRecord  # noqa: F401
 from app.models.phishing import PhishingAnalysis, AnalysisType, RiskLevel  # noqa: F401
+from app.models.network import NetworkScan, NetworkHost, NetworkScanStatus  # noqa: F401
