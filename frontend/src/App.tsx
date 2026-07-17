@@ -10,6 +10,8 @@ import ThreatIntel from "./pages/ThreatIntel";
 import Forensics from "./pages/Forensics";
 import Phishing from "./pages/Phishing";
 import NetworkMonitoring from "./pages/NetworkMonitoring";
+import Assistant from "./pages/Assistant";
+import Incidents from "./pages/Incidents";
 
 function App() {
   return (
@@ -71,6 +73,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <NetworkMonitoring />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/assistant"
+            element={
+              <ProtectedRoute>
+                <Assistant />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/incidents"
+            element={
+              <ProtectedRoute>
+                <Incidents />
               </ProtectedRoute>
             }
           />

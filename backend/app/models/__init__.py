@@ -6,3 +6,5 @@ from app.models.threat_intel import ThreatLookup, LookupType, Verdict  # noqa: F
 from app.models.forensics import ForensicsRecord  # noqa: F401
 from app.models.phishing import PhishingAnalysis, AnalysisType, RiskLevel  # noqa: F401
 from app.models.network import NetworkScan, NetworkHost, NetworkScanStatus  # noqa: F401
+from app.models.assistant import ChatMessage, MessageRole  # noqa: F401
+from app.models.incident import Incident, IncidentNote, IncidentStatus, IncidentSeverity  # noqa: F401
