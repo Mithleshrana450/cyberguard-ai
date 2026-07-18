@@ -7,6 +7,12 @@ means tests can pass in a lightweight fake object (see tests/test_siem.py)
 instead of needing a real Redis server running - the same dependency-
 injection principle used throughout this project (compare to how `db` is
 always passed in, never imported directly, in every service function).
+
+Module 12 note: FAILED_LOGIN_THRESHOLD below is now the FALLBACK default,
+not the only value ever used. The actual threshold is read fresh from
+platform_settings on every call via get_setting_int() - an admin can
+change it from the Admin Panel and it takes effect on the very next
+login attempt, no restart needed.
 """
 
 from datetime import datetime, timezone
@@ -14,9 +20,10 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from app.models.security_event import AlertSeverity, AlertType, LoginEvent, SecurityAlert
+from app.services.platform_settings import get_setting_int
 
 FAILED_LOGIN_WINDOW_SECONDS = 300  # 5 minutes
-FAILED_LOGIN_THRESHOLD = 5
+FAILED_LOGIN_THRESHOLD = 5  # fallback default if no admin-configured setting exists yet
 
 
 def record_login_attempt(
@@ -33,6 +40,8 @@ def record_login_attempt(
     newly created SecurityAlert if this attempt just pushed the IP over
     the brute-force threshold, otherwise None.
     """
+    threshold = get_setting_int(db, "brute_force_threshold", FAILED_LOGIN_THRESHOLD)
+
     db.add(
         LoginEvent(
             user_id=user_id,
@@ -61,13 +70,13 @@ def record_login_attempt(
     # Fire exactly once per window, at the moment the count crosses the
     # threshold - not on every subsequent failure, which would flood the
     # alerts table with duplicate alerts for the same ongoing attack.
-    if count == FAILED_LOGIN_THRESHOLD:
+    if count == threshold:
         alert = SecurityAlert(
             alert_type=AlertType.BRUTE_FORCE_LOGIN,
             severity=AlertSeverity.CRITICAL,
             title=f"Possible brute-force attack from {ip_address}",
             description=(
-                f"{FAILED_LOGIN_THRESHOLD} failed login attempts were detected from IP "
+                f"{threshold} failed login attempts were detected from IP "
                 f"{ip_address} within {FAILED_LOGIN_WINDOW_SECONDS // 60} minutes. Most "
                 f"recent target: '{email_attempted}'."
             ),

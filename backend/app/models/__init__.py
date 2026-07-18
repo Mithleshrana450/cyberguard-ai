@@ -8,3 +8,4 @@ from app.models.phishing import PhishingAnalysis, AnalysisType, RiskLevel  # noq
 from app.models.network import NetworkScan, NetworkHost, NetworkScanStatus  # noqa: F401
 from app.models.assistant import ChatMessage, MessageRole  # noqa: F401
 from app.models.incident import Incident, IncidentNote, IncidentStatus, IncidentSeverity  # noqa: F401
+from app.models.admin import AuditLog, PlatformSetting  # noqa: F401

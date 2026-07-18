@@ -31,8 +31,8 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Digital Forensics", path: "/forensics", icon: Fingerprint, enabled: true },
   { label: "AI Assistant", path: "/assistant", icon: Brain, enabled: true },
   { label: "Incidents", path: "/incidents", icon: Siren, enabled: true },
-  { label: "Reports", path: "/reports", icon: FileBarChart2, enabled: false },
-  { label: "Admin Panel", path: "/admin", icon: Settings, enabled: false },
+  { label: "Reports", path: "/reports", icon: FileBarChart2, enabled: true },
+  { label: "Admin Panel", path: "/admin", icon: Settings, enabled: true },
   { label: "Analytics", path: "/analytics", icon: BarChart3, enabled: false },
 ];
 

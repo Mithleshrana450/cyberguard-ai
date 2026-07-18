@@ -12,6 +12,8 @@ import Phishing from "./pages/Phishing";
 import NetworkMonitoring from "./pages/NetworkMonitoring";
 import Assistant from "./pages/Assistant";
 import Incidents from "./pages/Incidents";
+import Reports from "./pages/Reports";
+import AdminPanel from "./pages/AdminPanel";
 
 function App() {
   return (
@@ -89,6 +91,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <Incidents />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <Reports />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminPanel />
               </ProtectedRoute>
             }
           />

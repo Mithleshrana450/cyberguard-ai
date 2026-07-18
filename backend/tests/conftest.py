@@ -105,6 +105,13 @@ def setup_db():
     Base.metadata.create_all(bind=engine)
     fake_redis._store.clear()
     fake_redis._expiry.clear()
+
+    from app.services.platform_settings import seed_default_settings
+
+    db = TestingSessionLocal()
+    seed_default_settings(db)
+    db.close()
+
     yield
     Base.metadata.drop_all(bind=engine)
 
