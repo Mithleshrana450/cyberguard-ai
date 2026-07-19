@@ -33,7 +33,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Incidents", path: "/incidents", icon: Siren, enabled: true },
   { label: "Reports", path: "/reports", icon: FileBarChart2, enabled: true },
   { label: "Admin Panel", path: "/admin", icon: Settings, enabled: true },
-  { label: "Analytics", path: "/analytics", icon: BarChart3, enabled: false },
+  { label: "Analytics", path: "/analytics", icon: BarChart3, enabled: true },
 ];
 
 export default function Sidebar() {

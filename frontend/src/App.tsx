@@ -14,6 +14,7 @@ import Assistant from "./pages/Assistant";
 import Incidents from "./pages/Incidents";
 import Reports from "./pages/Reports";
 import AdminPanel from "./pages/AdminPanel";
+import Analytics from "./pages/Analytics";
 
 function App() {
   return (
@@ -107,6 +108,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminPanel />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <Analytics />
               </ProtectedRoute>
             }
           />

@@ -1,6 +1,6 @@
 # 🛡️ CyberGuard AI
 
-**An AI-powered cybersecurity management platform** — built module by module as a hands-on demonstration of secure software engineering, from JWT authentication and RBAC to a working brute-force detection SIEM and real threat-intelligence integrations.
+**A complete, AI-powered cybersecurity management platform** — built module by module as a hands-on demonstration of secure software engineering, from JWT authentication and RBAC to a working brute-force detection SIEM, real threat-intelligence integrations, and an AI security assistant grounded in live platform data.
 
 <p>
   <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python 3.12" />
@@ -10,10 +10,11 @@
   <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
   <img src="https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white" alt="Redis" />
   <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Tests-190%20passing-brightgreen" alt="190 tests passing" />
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License" />
 </p>
 
-This project is being built incrementally, one fully-tested module at a time — every feature ships with real automated tests (currently **51 passing backend tests**), an ER diagram, an API reference, and a written rationale for its design decisions. Nothing here is scaffolding for its own sake: the scanner does real passive header/TLS analysis, the SIEM does real Redis-backed brute-force detection, and the threat-intel module calls a real external API.
+All **14 planned modules are complete** — every feature ships with real automated tests (**190 passing backend tests**), an ER diagram, an API reference, and a written rationale for its design decisions. Nothing here is scaffolding for its own sake: the scanner does real passive header/TLS analysis, the SIEM does real Redis-backed brute-force detection with an admin-configurable threshold, the network monitor enforces a hard-coded private-IP-only authorization boundary, and the AI assistant answers questions grounded in your actual live security data across five modules.
 
 ---
 
@@ -35,32 +36,28 @@ This project is being built incrementally, one fully-tested module at a time —
 
 ## ✨ Features
 
-### ✅ Built & tested
-
 | Module | What it does |
 |---|---|
 | 🔐 **Authentication & RBAC** | JWT access/refresh tokens, bcrypt password hashing, role-based access control (`admin` / `analyst` / `viewer`) |
-| 📊 **Dashboard** | Live security score, alert counts, and recent activity — pulled from real data across every other module |
+| 📊 **Dashboard** | Live security score, alert counts, and recent activity pulled from real data across every module |
 | 🌐 **Website Security Scanner** | Passive security header analysis, TLS certificate health checks, `robots.txt` exposure checks, weighted 0–100 scoring |
-| 📋 **Mini SIEM** | Every login attempt logged; Redis-backed brute-force detection with automatic, deduplicated alerting |
+| 📋 **Mini SIEM** | Every login attempt logged; Redis-backed brute-force detection with admin-configurable threshold and deduplicated alerting |
 | 🛰️ **Threat Intelligence** | IP / domain / URL / file-hash reputation lookups via VirusTotal's 70+ vendor aggregate, with Redis response caching |
-
-### 🚧 Planned
-
-🎣 Phishing Detection · 🖥️ Network Monitoring · 🔍 Digital Forensics · 🧠 AI Security Assistant · 🚨 Incident Management · 📄 Reports · ⚙️ Admin Panel · 📈 Analytics
-
-See the [Roadmap](#-roadmap) for the full build order.
+| 🔍 **Digital Forensics** | File hashing (MD5/SHA-1/SHA-256), EXIF metadata extraction with GPS privacy warnings, integrity verification, automatic threat-intel cross-check |
+| 🎣 **Phishing Detection** | URL/email heuristics (typosquatting, link tricks, urgency language), weighted risk scoring, optional AI-generated plain-English explanation |
+| 🖥️ **Network Monitoring** | TCP connect device/port discovery, with a hard-enforced private-IP-only authorization boundary — even admins cannot scan public targets |
+| 🧠 **AI Security Assistant** | Persistent chat, automatically grounded in your live scan scores, alerts, threat-intel verdicts, and network scan results |
+| 🚨 **Incident Management** | Full status workflow (open → investigating → resolved → closed) enforced as a real state machine, investigation notes, differentiated RBAC |
+| 📄 **Reports** | PDF security audit summaries and CSV exports for every module's history |
+| ⚙️ **Admin Panel** | User management with a self-lockout protection guard, audit logging, and an admin-configurable platform setting wired to real SIEM behavior |
+| 📈 **Analytics** | Platform-wide trends, severity distributions, and executive KPIs across every module |
 
 ---
 
 ## 📸 Screenshots
 
 > _Add screenshots of your running app here — the Dashboard, Scanner results, and SIEM alert view make strong portfolio visuals. Drag images into this section on GitHub, or reference files in a `docs/screenshots/` folder, e.g.:_
-> `![Dashboard](docs/screenshots/Screenshot\ From\ 2026-07-16\ 20-20-25.png)`
-> `![Scanner](docs/screenshots/Screenshot\ From\ 2026-07-16\ 20-20-19.png)`
-> `![SIEM](docs/screenshots/Screenshot\ From\ 2026-07-16\ 20-20-40.png)`
-> `![Threat Intelligence](docs/screenshots/Screenshot\ From\ 2026-07-16\ 20-20-30.png)`
-> `![Login](docs/screenshots/Screenshot\ From\ 2026-07-16\ 20-20-13.png)`
+> `![Dashboard](docs/screenshots/dashboard.png)`
 
 ---
 
@@ -73,7 +70,8 @@ See the [Roadmap](#-roadmap) for the full build order.
 | **Database** | PostgreSQL 16 |
 | **Caching / Rate Tracking** | Redis 7 |
 | **Auth** | JWT (access + refresh tokens), bcrypt |
-| **External Intel** | VirusTotal API v3 |
+| **External Intel** | VirusTotal API v3, OpenAI API |
+| **PDF Generation** | reportlab |
 | **Infra** | Docker, Docker Compose |
 | **Testing** | pytest, FastAPI TestClient |
 
@@ -81,7 +79,7 @@ See the [Roadmap](#-roadmap) for the full build order.
 
 ## 🏗️ Architecture
 
-CyberGuard AI follows a **Clean Architecture** layering on the backend — routes stay thin, business logic lives in `services/`, and pure/testable logic (header analysis, brute-force detection, verdict interpretation) is deliberately separated from anything that touches the network or database. This is what makes it possible to unit-test security logic like "does this response contain a missing HSTS header" without ever making a real HTTP request.
+CyberGuard AI follows a **Clean Architecture** layering on the backend — routes stay thin, business logic lives in `services/`, and pure/testable logic (header analysis, brute-force detection, verdict interpretation, phishing heuristics, incident state transitions, analytics aggregation) is deliberately separated from anything that touches the network or database. This is what makes it possible to unit-test security logic — like "does this response contain a missing HSTS header" or "is jumping from `open` to `closed` a valid incident transition" — without ever making a real HTTP request.
 
 Full design rationale, including *why* each major decision was made, lives in [`docs/architecture.md`](docs/architecture.md) and the per-module docs in [`docs/api/`](docs/api/).
 
@@ -89,11 +87,13 @@ Full design rationale, including *why* each major decision was made, lives in [`
 Browser (React SPA)
       │  JWT Bearer token
       ▼
-FastAPI Backend  ──────►  PostgreSQL   (durable data: users, scans, alerts, lookups)
+FastAPI Backend  ──────►  PostgreSQL   (durable data: users, scans, alerts, incidents, ...)
       │
       └──────────────►  Redis         (brute-force counters, threat-intel cache)
       │
       └──────────────►  VirusTotal API (external threat intelligence)
+      │
+      └──────────────►  OpenAI API     (phishing explanations, AI assistant)
 ```
 
 ---
@@ -102,7 +102,8 @@ FastAPI Backend  ──────►  PostgreSQL   (durable data: users, scans
 
 ### Prerequisites
 - Docker & Docker Compose
-- A free [VirusTotal API key](https://www.virustotal.com/gui/join-us) (only required for the Threat Intelligence module)
+- A free [VirusTotal API key](https://www.virustotal.com/gui/join-us) (Threat Intelligence module)
+- An [OpenAI API key](https://platform.openai.com/api-keys) (Phishing Detection's AI explanation + AI Security Assistant — both work without it, just with reduced functionality)
 
 ### Setup
 
@@ -110,14 +111,14 @@ FastAPI Backend  ──────►  PostgreSQL   (durable data: users, scans
 git clone https://github.com/<your-username>/cyberguard-ai.git
 cd cyberguard-ai
 cp .env.example .env
-# then edit .env and add your VIRUSTOTAL_API_KEY
+# then edit .env and add your VIRUSTOTAL_API_KEY and OPENAI_API_KEY
 ```
 
 ```bash
 docker compose up --build
 ```
 
-Run database migrations (first time only, and after pulling any update that adds new tables):
+Run database migrations (first time, and after pulling any update that adds new tables):
 
 ```bash
 docker compose exec backend alembic upgrade head
@@ -136,13 +137,13 @@ docker compose exec backend alembic upgrade head
 
 ## 🧪 Testing
 
-Every module ships with automated tests — pure business logic (header analysis, brute-force detection, verdict scoring) is unit tested with no network dependency, and every API endpoint has integration tests with external calls mocked.
+Every module ships with automated tests — pure business logic (header analysis, brute-force detection, verdict scoring, phishing heuristics, incident workflow transitions, analytics aggregation) is unit tested with no network dependency, and every API endpoint has integration tests with external calls mocked.
 
 ```bash
 docker compose exec backend pytest tests/ -v
 ```
 
-**Current status: 51 passing tests** across authentication, dashboard, scanner, SIEM, and threat intelligence.
+**Current status: 190 passing tests** across all 14 modules.
 
 ---
 
@@ -158,13 +159,13 @@ cyberguard-ai/
 │   │   ├── schemas/         # Pydantic request/response schemas
 │   │   ├── services/        # Business logic (the "fat" layer, fully testable)
 │   │   └── db/               # Session and declarative base
-│   ├── alembic/               # Database migrations
-│   └── tests/                  # pytest suite
+│   ├── alembic/                # Database migrations
+│   └── tests/                    # pytest suite (190 tests)
 ├── frontend/
 │   └── src/
 │       ├── components/          # UI components, organized by feature + shared /ui
 │       ├── context/              # Auth context (token state, silent refresh)
-│       ├── pages/                  # Route-level pages
+│       ├── pages/                  # Route-level pages, one per module
 │       └── services/                # API client
 ├── docs/
 │   ├── architecture.md               # Module 0 foundational design decisions
@@ -182,15 +183,18 @@ Interactive, always-current API docs are auto-generated by FastAPI and available
 
 ## 🔒 Security & Responsible Use
 
-The Website Scanner and Threat Intelligence modules are built for **passive, authorized security testing only**:
+Several modules are built for **passive, authorized security testing only**:
 
-- The scanner only reads response headers, TLS certificate metadata, and `robots.txt` — the same data any browser reads on every page load. It never attempts exploitation.
-- **Only scan or look up targets you own or are explicitly authorized to test.** Good practice for any security tooling, regardless of how passive the checks are.
-- API keys (VirusTotal, and any future integrations) are managed via environment variables and are never committed to version control.
+- The **Website Scanner** and **Threat Intelligence** modules only read response headers, TLS certificate metadata, `robots.txt`, and public reputation data — the same data any browser or lookup service reads. Neither attempts exploitation.
+- The **Network Monitoring** module enforces a hard, server-side authorization boundary: only private/local IP ranges (RFC1918 + loopback) are accepted, and this is enforced independently of user role — even an admin account cannot scan a public IP through this platform.
+- **Only scan or look up targets you own or are explicitly authorized to test.**
+- API keys (VirusTotal, OpenAI, and any future integrations) are managed via environment variables and are never committed to version control.
 
 ---
 
 ## 🗺️ Roadmap
+
+All 14 planned modules are complete:
 
 - [x] Module 0 — Foundation & Docker environment
 - [x] Module 1 — Authentication & RBAC
@@ -198,14 +202,14 @@ The Website Scanner and Threat Intelligence modules are built for **passive, aut
 - [x] Module 3 — Website Security Scanner
 - [x] Module 4 — Mini SIEM
 - [x] Module 5 — Threat Intelligence
-- [ ] Module 6 — Digital Forensics
-- [ ] Module 7 — Phishing Detection
-- [ ] Module 8 — Network Monitoring
-- [ ] Module 9 — AI Security Assistant
-- [ ] Module 10 — Incident Management
-- [ ] Module 11 — Reports
-- [ ] Module 12 — Admin Panel
-- [ ] Module 13 — Analytics
+- [x] Module 6 — Digital Forensics
+- [x] Module 7 — Phishing Detection
+- [x] Module 8 — Network Monitoring
+- [x] Module 9 — AI Security Assistant
+- [x] Module 10 — Incident Management
+- [x] Module 11 — Reports
+- [x] Module 12 — Admin Panel
+- [x] Module 13 — Analytics
 
 ---
 
