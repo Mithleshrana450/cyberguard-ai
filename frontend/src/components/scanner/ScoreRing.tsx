@@ -4,15 +4,24 @@ const RADIUS = 50;
 const STROKE = 8;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-function scoreColor(score: number) {
-  if (score >= 80) return "#4ADE80";
-  if (score >= 50) return "#FBBF24";
+function scoreColor(score: number, invert: boolean) {
+  const effective = invert ? 100 - score : score;
+  if (effective >= 80) return "#4ADE80";
+  if (effective >= 50) return "#FBBF24";
   return "#F87171";
 }
 
-export default function ScoreRing({ score, size = 120 }: { score: number | null; size?: number }) {
+export default function ScoreRing({
+  score,
+  size = 120,
+  invert = false,
+}: {
+  score: number | null;
+  size?: number;
+  invert?: boolean;
+}) {
   const hasData = score !== null;
-  const stroke = hasData ? scoreColor(score) : "rgba(255,255,255,0.15)";
+  const stroke = hasData ? scoreColor(score, invert) : "rgba(255,255,255,0.15)";
   const progress = hasData ? score / 100 : 0;
   const offset = CIRCUMFERENCE * (1 - progress);
   const viewBox = 120;

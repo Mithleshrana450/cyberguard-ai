@@ -1,5 +1,6 @@
-import { FormEvent, useEffect, useState } from "react";
-import { AlertTriangle, Network as NetworkIcon, ShieldCheck } from "lucide-react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { AlertTriangle, Network as NetworkIcon, Router, ShieldCheck } from "lucide-react";
 import AppLayout from "../components/layout/AppLayout";
 import Skeleton from "../components/ui/Skeleton";
 import EmptyState from "../components/ui/EmptyState";
@@ -52,6 +53,13 @@ export default function NetworkMonitoring() {
     if (hasAccess) loadHistory();
   }, [hasAccess]);
 
+  const stats = useMemo(() => {
+    const items = history || [];
+    const totalHostsFound = items.reduce((sum, s) => sum + s.hosts_up, 0);
+    const lastScan = items[0] || null;
+    return { total: items.length, totalHostsFound, lastScan };
+  }, [history]);
+
   if (!hasAccess) {
     return (
       <AppLayout title="Network Monitoring">
@@ -82,13 +90,32 @@ export default function NetworkMonitoring() {
     }
   };
 
+  const upHosts = result ? result.hosts.filter((h) => h.is_up) : [];
+
   return (
     <AppLayout title="Network Monitoring">
-      <div className="mb-6">
-        <p className="text-text-primary text-lg">Discover devices &amp; open ports</p>
-        <p className="text-text-secondary text-sm">
+      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+        <p className="text-text-primary text-xl font-semibold tracking-tight">Discover devices &amp; open ports</p>
+        <p className="text-text-secondary text-sm mt-1">
           TCP connect scan across a private IP range - never public internet targets.
         </p>
+      </motion.div>
+
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="card p-4">
+          <p className="text-text-secondary text-xs uppercase tracking-wide">Total Scans</p>
+          <p className="font-mono text-2xl font-semibold text-text-primary mt-1">{stats.total}</p>
+        </div>
+        <div className="card p-4">
+          <p className="text-text-secondary text-xs uppercase tracking-wide">Hosts Found (all-time)</p>
+          <p className="font-mono text-2xl font-semibold text-safe mt-1">{stats.totalHostsFound}</p>
+        </div>
+        <div className="card p-4">
+          <p className="text-text-secondary text-xs uppercase tracking-wide">Last Range Scanned</p>
+          <p className="text-sm text-text-primary mt-1.5 font-mono truncate">
+            {stats.lastScan ? stats.lastScan.target_range : "—"}
+          </p>
+        </div>
       </div>
 
       {/* Authorization warning built directly into the UI, not just
@@ -108,54 +135,74 @@ export default function NetworkMonitoring() {
       </div>
 
       <form onSubmit={handleSubmit} className="flex gap-3 mb-8">
-        <input
-          type="text"
-          required
-          value={targetRange}
-          onChange={(e) => setTargetRange(e.target.value)}
-          placeholder="192.168.1.0/28"
-          className="flex-1 bg-surface border border-border rounded-lg px-3 py-2 text-text-primary text-sm font-mono focus:outline-none focus:border-accent"
-        />
-        <button
+        <div className="relative flex-1">
+          <Router size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+          <input
+            type="text"
+            required
+            value={targetRange}
+            onChange={(e) => setTargetRange(e.target.value)}
+            placeholder="192.168.1.0/28"
+            className="w-full bg-surface border border-border rounded-lg pl-9 pr-3 py-2.5 text-text-primary text-sm font-mono focus:outline-none focus:border-accent transition-colors"
+          />
+        </div>
+        <motion.button
+          whileTap={{ scale: 0.97 }}
           type="submit"
           disabled={isScanning}
-          className="bg-accent text-background font-medium rounded-lg px-5 py-2 text-sm hover:bg-accent/90 disabled:opacity-50 transition-colors whitespace-nowrap"
+          className="bg-accent text-background font-medium rounded-lg px-5 py-2.5 text-sm hover:bg-accent/90 disabled:opacity-50 transition-colors whitespace-nowrap"
         >
           {isScanning ? "Scanning..." : "Scan Network"}
-        </button>
+        </motion.button>
       </form>
 
       {error && (
-        <div className="text-critical text-sm bg-critical/10 border border-critical/30 rounded-lg px-3 py-2 mb-8">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-critical text-sm bg-critical/10 border border-critical/30 rounded-lg px-3 py-2 mb-8"
+        >
           {error}
-        </div>
+        </motion.div>
       )}
 
       {isScanning && <Skeleton className="h-40 mb-8" />}
 
-      {result && (
-        <div className="mb-10">
-          <div className="card p-4 mb-4 flex items-center gap-6">
-            <div>
-              <p className="text-text-secondary text-xs uppercase tracking-wide">Hosts Scanned</p>
-              <p className="font-mono text-2xl font-semibold text-text-primary">{result.hosts_scanned}</p>
+      <AnimatePresence mode="wait">
+        {result && !isScanning && (
+          <motion.div
+            key={result.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="mb-10"
+          >
+            <div className="card p-4 mb-4 flex items-center gap-6">
+              <div>
+                <p className="text-text-secondary text-xs uppercase tracking-wide">Hosts Scanned</p>
+                <p className="font-mono text-2xl font-semibold text-text-primary">{result.hosts_scanned}</p>
+              </div>
+              <div>
+                <p className="text-text-secondary text-xs uppercase tracking-wide">Hosts Up</p>
+                <p className="font-mono text-2xl font-semibold text-safe">{result.hosts_up}</p>
+              </div>
+              {result.status === "failed" && (
+                <span className="text-critical text-sm">{result.error_message}</span>
+              )}
             </div>
-            <div>
-              <p className="text-text-secondary text-xs uppercase tracking-wide">Hosts Up</p>
-              <p className="font-mono text-2xl font-semibold text-safe">{result.hosts_up}</p>
-            </div>
-            {result.status === "failed" && (
-              <span className="text-critical text-sm">{result.error_message}</span>
-            )}
-          </div>
 
-          <div className="flex flex-col gap-2">
-            {result.hosts
-              .filter((h) => h.is_up)
-              .map((host) => {
+            <div className="flex flex-col gap-2">
+              {upHosts.map((host, i) => {
                 const ports: number[] = JSON.parse(host.open_ports_json);
                 return (
-                  <div key={host.id} className="bg-surface-elevated border border-border rounded-lg shadow-soft-sm p-3">
+                  <motion.div
+                    key={host.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.06 }}
+                    className="bg-surface-elevated border border-border rounded-lg shadow-soft-sm p-3"
+                  >
                     <div className="flex items-center gap-2 mb-2">
                       <ShieldCheck size={14} className="text-safe" />
                       <span className="font-mono text-text-primary text-sm">{host.ip_address}</span>
@@ -173,15 +220,22 @@ export default function NetworkMonitoring() {
                         </span>
                       ))}
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
-            {result.hosts.filter((h) => h.is_up).length === 0 && (
-              <p className="text-text-secondary text-sm">No hosts responded in this range.</p>
-            )}
-          </div>
-        </div>
-      )}
+              {upHosts.length === 0 && (
+                <div className="card p-5">
+                  <EmptyState
+                    icon={ShieldCheck}
+                    title="No hosts responded"
+                    description="Nothing in this range answered on the checked ports."
+                  />
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="card p-5">
         <p className="text-text-secondary text-xs uppercase tracking-wide mb-4">Scan History</p>
@@ -200,13 +254,19 @@ export default function NetworkMonitoring() {
         )}
         {history && history.length > 0 && (
           <ul className="flex flex-col divide-y divide-border">
-            {history.map((scan) => (
-              <li key={scan.id} className="py-3 flex items-center justify-between gap-3 text-sm">
+            {history.map((scan, i) => (
+              <motion.li
+                key={scan.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: i * 0.03 }}
+                className="py-3 flex items-center justify-between gap-3 text-sm"
+              >
                 <span className="font-mono text-text-primary">{scan.target_range}</span>
                 <span className="text-text-secondary">
                   {scan.hosts_up}/{scan.hosts_scanned} up
                 </span>
-              </li>
+              </motion.li>
             ))}
           </ul>
         )}

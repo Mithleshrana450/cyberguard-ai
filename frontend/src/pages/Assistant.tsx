@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Bot, Send, Sparkles, Trash2, User as UserIcon } from "lucide-react";
 import AppLayout from "../components/layout/AppLayout";
 import api from "../services/api";
@@ -16,6 +17,21 @@ const SUGGESTED_PROMPTS = [
   "Summarize my recent alerts.",
   "What is a Content-Security-Policy header for?",
 ];
+
+function TypingDots() {
+  return (
+    <div className="flex items-center gap-1">
+      {[0, 1, 2].map((i) => (
+        <motion.span
+          key={i}
+          className="w-1.5 h-1.5 rounded-full bg-text-secondary"
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 1, repeat: Infinity, delay: i * 0.15 }}
+        />
+      ))}
+    </div>
+  );
+}
 
 export default function Assistant() {
   const [messages, setMessages] = useState<ChatMessage[] | null>(null);
@@ -77,23 +93,32 @@ export default function Assistant() {
 
   return (
     <AppLayout title="AI Security Assistant">
-      <div className="flex items-center justify-between mb-6">
+      <motion.div
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between mb-6"
+      >
         <div>
-          <p className="text-text-primary text-lg">Ask about your security posture</p>
-          <p className="text-text-secondary text-sm">
+          <p className="text-text-primary text-xl font-semibold tracking-tight">Ask about your security posture</p>
+          <p className="text-text-secondary text-sm mt-1">
             Grounded in your latest scans, alerts, and threat-intel results.
           </p>
         </div>
-        {messages && messages.length > 0 && (
-          <button
-            onClick={handleClear}
-            className="flex items-center gap-1.5 text-text-secondary hover:text-critical text-sm transition-colors"
-          >
-            <Trash2 size={14} />
-            Clear chat
-          </button>
-        )}
-      </div>
+        <AnimatePresence>
+          {messages && messages.length > 0 && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleClear}
+              className="flex items-center gap-1.5 text-text-secondary hover:text-critical text-sm transition-colors"
+            >
+              <Trash2 size={14} />
+              Clear chat
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
       <div className="card flex flex-col h-[600px]">
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
@@ -104,7 +129,11 @@ export default function Assistant() {
           )}
 
           {messages && messages.length === 0 && (
-            <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex-1 flex flex-col items-center justify-center gap-4 text-center"
+            >
               <div className="w-12 h-12 rounded-full bg-surface-elevated border border-border flex items-center justify-center">
                 <Sparkles size={20} strokeWidth={1.5} className="text-accent" />
               </div>
@@ -116,49 +145,60 @@ export default function Assistant() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 justify-center max-w-[420px]">
-                {SUGGESTED_PROMPTS.map((prompt) => (
-                  <button
+                {SUGGESTED_PROMPTS.map((prompt, i) => (
+                  <motion.button
                     key={prompt}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.06 }}
                     onClick={() => sendMessage(prompt)}
                     className="text-xs border border-border rounded-lg px-3 py-1.5 text-text-secondary hover:text-text-primary hover:border-accent transition-colors"
                   >
                     {prompt}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
-            </div>
+            </motion.div>
           )}
 
-          {messages?.map((msg) => (
-            <div key={msg.id} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
-              <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
-                  msg.role === "assistant" ? "bg-accent/15 text-accent" : "bg-surface-elevated text-text-secondary"
-                }`}
+          <AnimatePresence initial={false}>
+            {messages?.map((msg) => (
+              <motion.div
+                key={msg.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
               >
-                {msg.role === "assistant" ? <Bot size={14} /> : <UserIcon size={14} />}
-              </div>
-              <div
-                className={`max-w-[75%] rounded-lg px-3.5 py-2.5 text-sm whitespace-pre-wrap ${
-                  msg.role === "assistant"
-                    ? "bg-surface-elevated text-text-primary"
-                    : "bg-accent/10 text-text-primary"
-                }`}
-              >
-                {msg.content}
-              </div>
-            </div>
-          ))}
+                <div
+                  className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
+                    msg.role === "assistant" ? "bg-accent/15 text-accent" : "bg-surface-elevated text-text-secondary"
+                  }`}
+                >
+                  {msg.role === "assistant" ? <Bot size={14} /> : <UserIcon size={14} />}
+                </div>
+                <div
+                  className={`max-w-[75%] rounded-lg px-3.5 py-2.5 text-sm whitespace-pre-wrap ${
+                    msg.role === "assistant"
+                      ? "bg-surface-elevated text-text-primary"
+                      : "bg-accent/10 text-text-primary"
+                  }`}
+                >
+                  {msg.content}
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
 
           {isSending && (
-            <div className="flex gap-3">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
               <div className="w-7 h-7 rounded-full bg-accent/15 text-accent flex items-center justify-center shrink-0">
                 <Bot size={14} />
               </div>
-              <div className="bg-surface-elevated rounded-lg px-3.5 py-2.5 text-sm text-text-secondary">
-                Thinking...
+              <div className="bg-surface-elevated rounded-lg px-3.5 py-3 flex items-center">
+                <TypingDots />
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
 
@@ -170,15 +210,16 @@ export default function Assistant() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask a security question..."
-            className="flex-1 bg-surface-elevated border border-border rounded-lg px-3 py-2 text-text-primary text-sm focus:outline-none focus:border-accent"
+            className="flex-1 bg-surface-elevated border border-border rounded-lg px-3 py-2 text-text-primary text-sm focus:outline-none focus:border-accent transition-colors"
           />
-          <button
+          <motion.button
+            whileTap={{ scale: 0.93 }}
             type="submit"
             disabled={isSending || !input.trim()}
             className="bg-accent text-background rounded-lg px-4 py-2 hover:bg-accent/90 disabled:opacity-50 transition-colors"
           >
             <Send size={16} />
-          </button>
+          </motion.button>
         </form>
       </div>
     </AppLayout>
