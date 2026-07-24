@@ -11,6 +11,9 @@ This means:
   3. There is ONE place to see every config value the app depends on.
 """
 
+from typing import Any
+
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -32,7 +35,22 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # --- CORS ---
+    # On cloud platforms (Render, Railway, etc.) env vars must be plain strings,
+    # not JSON arrays. Set CORS_ORIGINS as a comma-separated list:
+    #   CORS_ORIGINS=https://myapp.vercel.app,http://localhost:5173
+    # The validator below splits it into a proper list automatically.
     CORS_ORIGINS: list[str] = ["http://localhost:5173"]
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, value: Any) -> list[str]:
+        if isinstance(value, list):
+            return value
+        if isinstance(value, str):
+            # Strip surrounding brackets if someone passed JSON-style value
+            value = value.strip().strip("[]")
+            return [origin.strip().strip('"').strip("'") for origin in value.split(",") if origin.strip()]
+        raise ValueError("CORS_ORIGINS must be a list or comma-separated string")
 
     # --- Threat Intelligence (Module 5) ---
     # Free tier key from https://www.virustotal.com/gui/join-us - never
