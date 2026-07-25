@@ -115,7 +115,7 @@ FastAPI Backend  ──────►  PostgreSQL   (durable data: users, scans
 ### Setup
 
 ```bash
-git clone https://github.com/<your-username>/cyberguard-ai.git
+git clone https://github.com/mithleshrana450/cyberguard-ai.git
 cd cyberguard-ai
 cp .env.example .env
 # then edit .env and add your VIRUSTOTAL_API_KEY and OPENAI_API_KEY
