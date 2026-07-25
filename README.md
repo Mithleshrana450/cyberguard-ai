@@ -1,6 +1,6 @@
 # 🛡️ CyberGuard AI
 
-**A complete, AI-powered cybersecurity management platform** — built module by module as a hands-on demonstration of secure software engineering, from JWT authentication and RBAC to a working brute-force detection SIEM, real threat-intelligence integrations, and an AI security assistant grounded in live platform data.
+**A complete, AI-powered cybersecurity management platform** — designed, built, and tested module by module as a hands-on demonstration of secure full-stack engineering, from JWT authentication and RBAC to a working Redis-backed brute-force detection SIEM, real threat-intelligence integrations, and an AI security assistant grounded in live platform data.
 
 <p>
   <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python 3.12" />
@@ -14,7 +14,12 @@
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License" />
 </p>
 
-All **14 planned modules are complete** — every feature ships with real automated tests (**190 passing backend tests**), an ER diagram, an API reference, and a written rationale for its design decisions. Nothing here is scaffolding for its own sake: the scanner does real passive header/TLS analysis, the SIEM does real Redis-backed brute-force detection with an admin-configurable threshold, the network monitor enforces a hard-coded private-IP-only authorization boundary, and the AI assistant answers questions grounded in your actual live security data across five modules.
+<!--
+Once deployed, replace the line below with something like:
+### 🔗 [Live Demo](https://your-app.up.railway.app) &nbsp;|&nbsp; [API Docs](https://your-backend.up.railway.app/api/docs)
+-->
+
+All **14 planned modules are complete**, and every panel has been through a full UI/UX polish pass — circular score rings, animated donut charts, real-time trend visualizations, and Framer Motion throughout. Every feature ships with real automated tests (**190 passing backend tests**), an ER diagram, an API reference, and a written rationale for its design decisions. Nothing here is scaffolding for its own sake: the scanner does real passive header/TLS analysis, the SIEM does real Redis-backed brute-force detection with an admin-configurable threshold, the network monitor enforces a hard-coded private-IP-only authorization boundary even for admin accounts, and the AI assistant answers questions grounded in your actual live security data pulled from five different modules.
 
 ---
 
@@ -25,11 +30,13 @@ All **14 planned modules are complete** — every feature ships with real automa
 - [Tech Stack](#-tech-stack)
 - [Architecture](#-architecture)
 - [Getting Started](#-getting-started)
+- [Deployment](#-deployment)
 - [Testing](#-testing)
 - [Project Structure](#-project-structure)
 - [API Documentation](#-api-documentation)
 - [Security & Responsible Use](#-security--responsible-use)
 - [Roadmap](#-roadmap)
+- [Author](#-author)
 - [License](#-license)
 
 ---
@@ -39,8 +46,8 @@ All **14 planned modules are complete** — every feature ships with real automa
 | Module | What it does |
 |---|---|
 | 🔐 **Authentication & RBAC** | JWT access/refresh tokens, bcrypt password hashing, role-based access control (`admin` / `analyst` / `viewer`) |
-| 📊 **Dashboard** | Live security score, alert counts, and recent activity pulled from real data across every module |
-| 🌐 **Website Security Scanner** | Passive security header analysis, TLS certificate health checks, `robots.txt` exposure checks, weighted 0–100 scoring |
+| 📊 **Dashboard** | Circular security score gauge with week-over-week trend, real-time metrics, score/success-rate charts, and an activity feed — all backed by live data |
+| 🌐 **Website Security Scanner** | Passive security header analysis, TLS certificate health checks, `robots.txt` exposure checks, weighted 0–100 scoring, clickable scan history |
 | 📋 **Mini SIEM** | Every login attempt logged; Redis-backed brute-force detection with admin-configurable threshold and deduplicated alerting |
 | 🛰️ **Threat Intelligence** | IP / domain / URL / file-hash reputation lookups via VirusTotal's 70+ vendor aggregate, with Redis response caching |
 | 🔍 **Digital Forensics** | File hashing (MD5/SHA-1/SHA-256), EXIF metadata extraction with GPS privacy warnings, integrity verification, automatic threat-intel cross-check |
@@ -135,6 +142,24 @@ docker compose exec backend alembic upgrade head
 
 ---
 
+## ☁️ Deployment
+
+This project deploys to [Railway](https://railway.com) with minimal changes, since Railway can run the existing `docker-compose.yml` directly (backend, frontend, PostgreSQL, and Redis as-is).
+
+**Quick summary:**
+1. Push the repo to GitHub, then **New Project → Deploy from GitHub repo** on Railway
+2. Set backend environment variables: `SECRET_KEY`, `VIRUSTOTAL_API_KEY`, `OPENAI_API_KEY`, `DATABASE_URL`, `REDIS_URL`
+3. Generate public domains for the `frontend` and `backend` services
+4. Set `VITE_API_URL` on the frontend service to the backend's public URL, then **redeploy** (Vite bakes this in at build time, not runtime)
+5. Set `CORS_ORIGINS=["https://your-frontend-url"]` on the backend, then redeploy
+6. Run migrations against the live database: `railway run --service backend alembic upgrade head`
+
+All config is environment-variable driven already (see `app/core/config.py`), so no code changes are required to deploy — only configuration.
+
+**Free alternative:** frontend on [Vercel](https://vercel.com) (free) + backend/DB/Redis on [Render](https://render.com)'s free tier (free, but the server sleeps after inactivity and takes ~30s to wake on the next request — fine for a portfolio demo, noticeable if you need instant response).
+
+---
+
 ## 🧪 Testing
 
 Every module ships with automated tests — pure business logic (header analysis, brute-force detection, verdict scoring, phishing heuristics, incident workflow transitions, analytics aggregation) is unit tested with no network dependency, and every API endpoint has integration tests with external calls mocked.
@@ -210,6 +235,17 @@ All 14 planned modules are complete:
 - [x] Module 11 — Reports
 - [x] Module 12 — Admin Panel
 - [x] Module 13 — Analytics
+- [x] Full UI/UX redesign pass across every panel
+
+Possible future directions: background job processing for larger scans (Celery), password reset via email, live production deployment with a custom domain and CI/CD.
+
+---
+
+## 👤 Author
+
+Built as a final-year BCA project and portfolio piece by a student on an Ethical Hacking / Cybersecurity Engineering learning path.
+
+Feel free to open an issue or reach out if you have questions about the design decisions behind any module — most of them are documented in [`docs/api/`](docs/api/), but I'm happy to talk through the reasoning.
 
 ---
 
@@ -220,5 +256,5 @@ Licensed under the [MIT License](LICENSE).
 ---
 
 <p align="center">
-  Built as a final-year BCA project, portfolio piece, and hands-on cybersecurity + full-stack engineering learning path.
+  ⭐ If this project is useful as a reference or portfolio example, consider starring the repo.
 </p>
